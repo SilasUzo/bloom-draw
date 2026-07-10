@@ -3,6 +3,15 @@ const { getStore } = require("@netlify/blobs");
 const STORE_NAME = "bloom-scheme";
 const STATE_KEY = "state";
 
+function getBlobStore() {
+  const siteID = process.env.BLOBS_SITE_ID;
+  const token = process.env.BLOBS_TOKEN;
+  if (siteID && token) {
+    return getStore({ name: STORE_NAME, siteID, token });
+  }
+  return getStore(STORE_NAME);
+}
+
 function resp(status, body) {
   return {
     statusCode: status,
@@ -27,12 +36,4 @@ exports.handler = async (event) => {
   if (!adminPasscode) {
     return resp(500, { error: "No ADMIN_PASSCODE is configured on this site yet." });
   }
-  if (body.passcode !== adminPasscode) {
-    return resp(401, { error: "Incorrect passcode." });
-  }
-
-  const store = getStore(STORE_NAME);
-  await store.delete(STATE_KEY);
-
-  return resp(200, { ok: true });
-};
+  if (body.passcode
