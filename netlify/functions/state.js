@@ -3,6 +3,15 @@ const { getStore } = require("@netlify/blobs");
 const STORE_NAME = "bloom-scheme";
 const STATE_KEY = "state";
 
+function getBlobStore() {
+  const siteID = process.env.BLOBS_SITE_ID;
+  const token = process.env.BLOBS_TOKEN;
+  if (siteID && token) {
+    return getStore({ name: STORE_NAME, siteID, token });
+  }
+  return getStore(STORE_NAME);
+}
+
 function resp(status, body) {
   return {
     statusCode: status,
@@ -12,7 +21,7 @@ function resp(status, body) {
 }
 
 exports.handler = async () => {
-  const store = getStore(STORE_NAME);
+  const store = getBlobStore();
   const state = await store.get(STATE_KEY, { type: "json" });
 
   if (!state) {
