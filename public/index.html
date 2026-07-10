@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Bloom Draw</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="field"></div>
+
+<header class="hero">
+  <p class="eyebrow">a contribution draw</p>
+  <h1>The Bloom Draw</h1>
+  <p class="sub">Plant your name beside a flower, and the garden will give you your number &mdash; fair, random, and yours to keep.</p>
+</header>
+
+<main class="layout">
+
+  <section class="panel plant-panel" aria-labelledby="plant-heading">
+    <h2 id="plant-heading">Plant your entry</h2>
+
+    <div id="setup-note" class="note hidden">
+      <span class="note-mark">⚘</span>
+      <p>You're the first to arrive. Choose how many friends are in this draw &mdash; that number won't change once planted.</p>
+    </div>
+
+    <form id="entry-form" autocomplete="off">
+      <label for="name">Your name</label>
+      <input type="text" id="name" name="name" placeholder="e.g. Ntinuokwu Silas" maxlength="60" required />
+
+      <label for="flower">Your flower</label>
+      <input type="text" id="flower" name="flower" placeholder="e.g. Rose" maxlength="40" required />
+
+      <div id="slots-field" class="hidden">
+        <label for="totalSlots">Total number of friends in the draw</label>
+        <input type="number" id="totalSlots" name="totalSlots" min="2" max="100" value="8" />
+      </div>
+
+      <button type="submit" id="submit-btn">Draw my number</button>
+      <p id="form-error" class="error hidden"></p>
+    </form>
+
+    <div id="result" class="result hidden">
+      <p class="result-label">Your number is</p>
+      <div class="result-number" id="result-number">—</div>
+      <p class="result-name" id="result-name"></p>
+      <p id="result-note" class="result-note"></p>
+    </div>
+  </section>
+
+  <section class="panel garden-panel" aria-labelledby="garden-heading">
+    <div class="garden-header">
+      <h2 id="garden-heading">The garden so far</h2>
+      <p id="garden-count" class="garden-count"></p>
+    </div>
+    <p id="garden-empty" class="empty">No one has planted an entry yet. Be the first.</p>
+    <ol id="garden-list" class="garden-list"></ol>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <button id="reset-toggle" class="link-btn">Organizer reset</button>
+  <div id="reset-box" class="reset-box hidden">
+    <input type="password" id="reset-passcode" placeholder="Passcode" />
+    <button id="reset-btn">Clear this draw</button>
+    <p id="reset-msg" class="reset-msg"></p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "bloom-draw",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A random number draw app where each friend is assigned a flower and a contribution number.",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}
