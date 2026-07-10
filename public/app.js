@@ -1,8 +1,6 @@
 const form = document.getElementById("entry-form");
 const nameInput = document.getElementById("name");
 const flowerInput = document.getElementById("flower");
-const slotsField = document.getElementById("slots-field");
-const totalSlotsInput = document.getElementById("totalSlots");
 const setupNote = document.getElementById("setup-note");
 const submitBtn = document.getElementById("submit-btn");
 const formError = document.getElementById("form-error");
@@ -21,6 +19,13 @@ const resetBox = document.getElementById("reset-box");
 const resetPasscode = document.getElementById("reset-passcode");
 const resetBtn = document.getElementById("reset-btn");
 const resetMsg = document.getElementById("reset-msg");
+
+const setupToggle = document.getElementById("setup-toggle");
+const setupBox = document.getElementById("setup-box");
+const setupSlots = document.getElementById("setup-slots");
+const setupPasscode = document.getElementById("setup-passcode");
+const setupBtn = document.getElementById("setup-btn");
+const setupMsg = document.getElementById("setup-msg");
 
 const LOCAL_KEY = "bloom-draw-mine";
 
@@ -71,10 +76,10 @@ async function refreshState() {
     renderGarden(data.entries, data.totalSlots, data.remaining);
     if (!data.initialized) {
       setupNote.classList.remove("hidden");
-      slotsField.classList.remove("hidden");
+      submitBtn.disabled = true;
     } else {
       setupNote.classList.add("hidden");
-      slotsField.classList.add("hidden");
+      submitBtn.disabled = false;
     }
   } catch (err) {
     // Silent fail on background refresh; the form still works on submit.
@@ -106,11 +111,7 @@ form.addEventListener("submit", async (e) => {
     const res = await fetch("/api/submit", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        name,
-        flower,
-        totalSlots: totalSlotsInput.value,
-      }),
+      body: JSON.stringify({ name, flower }),
     });
     const data = await res.json();
 
@@ -132,7 +133,6 @@ form.addEventListener("submit", async (e) => {
 
     renderGarden(data.entries, data.totalSlots, data.remaining);
     setupNote.classList.add("hidden");
-    slotsField.classList.add("hidden");
     form.reset();
   } catch (err) {
     showError("Couldn't reach the garden. Check your connection and try again.");
@@ -142,8 +142,45 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
+setupToggle.addEventListener("click", () => {
+  setupBox.classList.toggle("hidden");
+  resetBox.classList.add("hidden");
+});
+
+setupBtn.addEventListener("click", async () => {
+  const passcode = setupPasscode.value;
+  const totalSlots = parseInt(setupSlots.value, 10);
+  if (!passcode) {
+    setupMsg.textContent = "Enter the organizer passcode.";
+    return;
+  }
+  if (!Number.isFinite(totalSlots) || totalSlots < 2) {
+    setupMsg.textContent = "Enter how many friends are in the draw (2 or more).";
+    return;
+  }
+  setupMsg.textContent = "Opening the draw...";
+  try {
+    const res = await fetch("/api/init", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ passcode, totalSlots }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setupMsg.textContent = data.error || "Could not set up the draw.";
+      return;
+    }
+    setupMsg.textContent = `Draw opened for ${data.totalSlots} friends. Share the link now.`;
+    setupPasscode.value = "";
+    await refreshState();
+  } catch (err) {
+    setupMsg.textContent = "Couldn't reach the garden.";
+  }
+});
+
 resetToggle.addEventListener("click", () => {
   resetBox.classList.toggle("hidden");
+  setupBox.classList.add("hidden");
 });
 
 resetBtn.addEventListener("click", async () => {

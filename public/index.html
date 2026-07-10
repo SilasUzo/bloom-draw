@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>United By Integrity</title>
+<title>The Bloom Draw</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
 
 <header class="hero">
   <p class="eyebrow">a contribution draw</p>
-  <h1>United By Integrity</h1>
+  <h1>The Bloom Draw</h1>
   <p class="sub">Plant your name beside a flower, and the garden will give you your number &mdash; fair, random, and yours to keep.</p>
 </header>
 
@@ -26,7 +26,7 @@
 
     <div id="setup-note" class="note hidden">
       <span class="note-mark">⚘</span>
-      <p>You're the first to arrive. Choose how many friends are in this draw &mdash; that number won't change once planted.</p>
+      <p>This draw hasn't been opened yet. Ask the organizer to set it up before you plant your entry.</p>
     </div>
 
     <form id="entry-form" autocomplete="off">
@@ -35,11 +35,6 @@
 
       <label for="flower">Your flower</label>
       <input type="text" id="flower" name="flower" placeholder="e.g. Rose" maxlength="40" required />
-
-      <div id="slots-field" class="hidden">
-        <label for="totalSlots">Total number of friends in the draw</label>
-        <input type="number" id="totalSlots" name="totalSlots" min="2" max="100" value="8" />
-      </div>
 
       <button type="submit" id="submit-btn">Draw my number</button>
       <p id="form-error" class="error hidden"></p>
@@ -65,7 +60,16 @@
 </main>
 
 <footer class="site-footer">
+  <button id="setup-toggle" class="link-btn">Organizer setup</button>
   <button id="reset-toggle" class="link-btn">Organizer reset</button>
+
+  <div id="setup-box" class="reset-box hidden">
+    <input type="number" id="setup-slots" placeholder="Number of friends" min="2" max="200" />
+    <input type="password" id="setup-passcode" placeholder="Passcode" />
+    <button id="setup-btn">Open the draw</button>
+    <p id="setup-msg" class="reset-msg"></p>
+  </div>
+
   <div id="reset-box" class="reset-box hidden">
     <input type="password" id="reset-passcode" placeholder="Passcode" />
     <button id="reset-btn">Clear this draw</button>

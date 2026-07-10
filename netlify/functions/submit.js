@@ -20,14 +20,6 @@ function resp(status, body) {
   };
 }
 
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
 function sortedEntries(state) {
   return [...state.entries]
     .sort((a, b) => a.number - b.number)
@@ -48,7 +40,6 @@ exports.handler = async (event) => {
 
   const name = (body.name || "").trim();
   const flower = (body.flower || "").trim();
-  const requestedSlots = parseInt(body.totalSlots, 10);
 
   if (!name || !flower) {
     return resp(400, { error: "Please provide both a name and a flower." });
@@ -58,15 +49,13 @@ exports.handler = async (event) => {
   }
 
   const store = getBlobStore();
-  let state = await store.get(STATE_KEY, { type: "json" });
+  const state = await store.get(STATE_KEY, { type: "json" });
 
   if (!state) {
-    const slots = Number.isFinite(requestedSlots) && requestedSlots >= 2 ? Math.min(requestedSlots, 100) : 8;
-    state = {
-      totalSlots: slots,
-      availableNumbers: shuffle(Array.from({ length: slots }, (_, i) => i + 1)),
-      entries: [],
-    };
+    return resp(409, {
+      error: "This draw hasn't been set up yet. Ask the organizer to set the number of friends first.",
+      notInitialized: true,
+    });
   }
 
   const key = name.toLowerCase();
