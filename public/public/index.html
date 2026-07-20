@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Bloom Draw</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="field"></div>
+
+<header class="hero">
+  <p class="eyebrow">a contribution draw</p>
+  <h1>The Bloom Draw</h1>
+  <p class="sub">Plant your name beside a flower, and the garden will give you your number &mdash; fair, random, and yours to keep.</p>
+</header>
+
+<main class="layout">
+
+  <section class="panel plant-panel" aria-labelledby="plant-heading">
+    <h2 id="plant-heading">Plant your entry</h2>
+
+    <div id="setup-note" class="note hidden">
+      <span class="note-mark">⚘</span>
+      <p>This draw hasn't been opened yet. Ask the organizer to set it up before you plant your entry.</p>
+    </div>
+
+    <form id="entry-form" autocomplete="off">
+      <label for="name">Your name</label>
+      <input type="text" id="name" name="name" placeholder="e.g. Ntinuokwu Silas" maxlength="60" required />
+
+      <label for="flower">Your flower</label>
+      <input type="text" id="flower" name="flower" placeholder="e.g. Rose" maxlength="40" required />
+
+      <label for="bankName">Bank name <span class="optional-tag">(optional &mdash; add anytime)</span></label>
+      <input type="text" id="bankName" name="bankName" placeholder="e.g. Zenith Bank" maxlength="60" />
+
+      <label for="accountNumber">Account number <span class="optional-tag">(optional)</span></label>
+      <input type="text" id="accountNumber" name="accountNumber" placeholder="e.g. 0123456789" maxlength="40" />
+
+      <label for="accountName">Account name <span class="optional-tag">(optional, if different from your name)</span></label>
+      <input type="text" id="accountName" name="accountName" placeholder="e.g. Ntinuokwu Silas Rose" maxlength="60" />
+
+      <button type="submit" id="submit-btn">Draw my number</button>
+      <p id="form-help" class="form-help">Already have your number? Enter the same name and flower again to add or update your bank details &mdash; it won't draw a new number.</p>
+      <p id="form-error" class="error hidden"></p>
+    </form>
+
+    <div id="result" class="result hidden">
+      <p class="result-label">Your number is</p>
+      <div class="result-number" id="result-number">—</div>
+      <p class="result-name" id="result-name"></p>
+      <p id="result-note" class="result-note"></p>
+    </div>
+  </section>
+
+  <section class="panel garden-panel" aria-labelledby="garden-heading">
+    <div class="garden-header">
+      <h2 id="garden-heading">The draw dashboard</h2>
+      <p id="garden-count" class="garden-count"></p>
+    </div>
+
+    <div id="current-turn-card" class="current-turn hidden">
+      <p class="current-label">Now collecting</p>
+      <p class="current-name" id="current-name"></p>
+      <p class="current-flower" id="current-flower"></p>
+      <div id="current-bank" class="current-bank hidden">
+        <p><span>Bank:</span> <span id="current-bank-name"></span></p>
+        <p><span>Account:</span> <span id="current-account-number"></span></p>
+        <p id="current-account-name-row"><span>Account name:</span> <span id="current-account-name"></span></p>
+      </div>
+      <p id="current-no-bank" class="current-no-bank hidden">Waiting on this person's bank details.</p>
+    </div>
+
+    <p id="all-done-note" class="empty hidden">Everyone has collected their contribution. 🌸</p>
+    <p id="garden-empty" class="empty hidden">No one has planted an entry yet. Be the first.</p>
+
+    <div id="up-next-section" class="hidden">
+      <h3 class="sub-heading">Up next</h3>
+      <ol id="garden-list" class="garden-list"></ol>
+    </div>
+
+    <button id="history-toggle" class="link-btn history-toggle hidden">Show history</button>
+    <div id="history-section" class="hidden">
+      <h3 class="sub-heading">Already collected</h3>
+      <ol id="history-list" class="garden-list"></ol>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <button id="setup-toggle" class="link-btn">Organizer setup</button>
+  <button id="reset-toggle" class="link-btn">Organizer reset</button>
+  <button id="markdone-toggle" class="link-btn">Mark contribution collected</button>
+
+  <div id="setup-box" class="reset-box hidden">
+    <input type="number" id="setup-slots" placeholder="Number of friends" min="2" max="200" />
+    <input type="password" id="setup-passcode" placeholder="Passcode" />
+    <button id="setup-btn">Open the draw</button>
+    <p id="setup-msg" class="reset-msg"></p>
+  </div>
+
+  <div id="reset-box" class="reset-box hidden">
+    <input type="password" id="reset-passcode" placeholder="Passcode" />
+    <button id="reset-btn">Clear this draw</button>
+    <p id="reset-msg" class="reset-msg"></p>
+  </div>
+
+  <div id="markdone-box" class="reset-box hidden">
+    <input type="number" id="markdone-number" placeholder="Number (e.g. 3)" min="1" />
+    <input type="password" id="markdone-passcode" placeholder="Passcode" />
+    <button id="markdone-btn">Mark as done</button>
+    <p id="markdone-msg" class="reset-msg"></p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
