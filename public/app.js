@@ -1,6 +1,9 @@
 const form = document.getElementById("entry-form");
 const nameInput = document.getElementById("name");
 const flowerInput = document.getElementById("flower");
+const bankNameInput = document.getElementById("bankName");
+const accountNumberInput = document.getElementById("accountNumber");
+const accountNameInput = document.getElementById("accountName");
 const setupNote = document.getElementById("setup-note");
 const submitBtn = document.getElementById("submit-btn");
 const formError = document.getElementById("form-error");
@@ -10,9 +13,26 @@ const resultNumber = document.getElementById("result-number");
 const resultName = document.getElementById("result-name");
 const resultNote = document.getElementById("result-note");
 
-const gardenList = document.getElementById("garden-list");
-const gardenEmpty = document.getElementById("garden-empty");
 const gardenCount = document.getElementById("garden-count");
+const gardenEmpty = document.getElementById("garden-empty");
+const allDoneNote = document.getElementById("all-done-note");
+
+const currentTurnCard = document.getElementById("current-turn-card");
+const currentName = document.getElementById("current-name");
+const currentFlower = document.getElementById("current-flower");
+const currentBank = document.getElementById("current-bank");
+const currentBankName = document.getElementById("current-bank-name");
+const currentAccountNumber = document.getElementById("current-account-number");
+const currentAccountName = document.getElementById("current-account-name");
+const currentAccountNameRow = document.getElementById("current-account-name-row");
+const currentNoBank = document.getElementById("current-no-bank");
+
+const upNextSection = document.getElementById("up-next-section");
+const gardenList = document.getElementById("garden-list");
+
+const historyToggle = document.getElementById("history-toggle");
+const historySection = document.getElementById("history-section");
+const historyList = document.getElementById("history-list");
 
 const resetToggle = document.getElementById("reset-toggle");
 const resetBox = document.getElementById("reset-box");
@@ -27,7 +47,20 @@ const setupPasscode = document.getElementById("setup-passcode");
 const setupBtn = document.getElementById("setup-btn");
 const setupMsg = document.getElementById("setup-msg");
 
+const markdoneToggle = document.getElementById("markdone-toggle");
+const markdoneBox = document.getElementById("markdone-box");
+const markdoneNumber = document.getElementById("markdone-number");
+const markdonePasscode = document.getElementById("markdone-passcode");
+const markdoneBtn = document.getElementById("markdone-btn");
+const markdoneMsg = document.getElementById("markdone-msg");
+
 const LOCAL_KEY = "bloom-draw-mine";
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
 
 function showError(msg) {
   formError.textContent = msg;
@@ -38,13 +71,61 @@ function clearError() {
   formError.textContent = "";
 }
 
-function renderGarden(entries, totalSlots, remaining) {
-  gardenList.innerHTML = "";
-  if (!entries || entries.length === 0) {
+function showResult(number, name, note) {
+  resultNumber.textContent = number;
+  resultName.textContent = name;
+  resultNote.textContent = note || "";
+  resultBox.classList.remove("hidden");
+}
+
+function renderDashboard(data) {
+  const { totalSlots, currentTurn, upNext, history } = data;
+  const totalPlanted = (currentTurn ? 1 : 0) + upNext.length + history.length;
+
+  gardenCount.textContent = totalSlots ? `${totalPlanted} of ${totalSlots} planted` : "";
+
+  // Current turn card
+  if (currentTurn) {
+    currentTurnCard.classList.remove("hidden");
+    allDoneNote.classList.add("hidden");
+    currentFlower.textContent = currentTurn.flower;
+    currentName.textContent = `#${currentTurn.number} — ${currentTurn.name}`;
+    if (currentTurn.hasBankDetails) {
+      currentBank.classList.remove("hidden");
+      currentNoBank.classList.add("hidden");
+      currentBankName.textContent = currentTurn.bankName || "—";
+      currentAccountNumber.textContent = currentTurn.accountNumber || "—";
+      if (currentTurn.accountName) {
+        currentAccountNameRow.classList.remove("hidden");
+        currentAccountName.textContent = currentTurn.accountName;
+      } else {
+        currentAccountNameRow.classList.add("hidden");
+      }
+    } else {
+      currentBank.classList.add("hidden");
+      currentNoBank.classList.remove("hidden");
+    }
+  } else {
+    currentTurnCard.classList.add("hidden");
+    if (totalPlanted > 0) {
+      allDoneNote.classList.remove("hidden");
+    } else {
+      allDoneNote.classList.add("hidden");
+    }
+  }
+
+  // Empty state
+  if (totalPlanted === 0) {
     gardenEmpty.classList.remove("hidden");
   } else {
     gardenEmpty.classList.add("hidden");
-    for (const e of entries) {
+  }
+
+  // Up next list
+  gardenList.innerHTML = "";
+  if (upNext.length > 0) {
+    upNextSection.classList.remove("hidden");
+    for (const e of upNext) {
       const li = document.createElement("li");
       li.className = "garden-card";
       li.innerHTML = `
@@ -55,25 +136,37 @@ function renderGarden(entries, totalSlots, remaining) {
         </div>`;
       gardenList.appendChild(li);
     }
-  }
-  if (totalSlots) {
-    gardenCount.textContent = `${entries.length} of ${totalSlots} planted`;
   } else {
-    gardenCount.textContent = "";
+    upNextSection.classList.add("hidden");
   }
-}
 
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
+  // History list
+  historyList.innerHTML = "";
+  if (history.length > 0) {
+    historyToggle.classList.remove("hidden");
+    for (const e of history) {
+      const li = document.createElement("li");
+      li.className = "garden-card";
+      const dateStr = e.doneAt ? new Date(e.doneAt).toLocaleDateString() : "";
+      li.innerHTML = `
+        <div class="garden-badge">${e.number}</div>
+        <div class="garden-info">
+          <p class="garden-name">${escapeHtml(e.name)}</p>
+          <p class="garden-flower">${escapeHtml(e.flower)} &middot; collected ${dateStr}</p>
+        </div>`;
+      historyList.appendChild(li);
+    }
+  } else {
+    historyToggle.classList.add("hidden");
+    historySection.classList.add("hidden");
+  }
 }
 
 async function refreshState() {
   try {
     const res = await fetch("/api/state");
     const data = await res.json();
-    renderGarden(data.entries, data.totalSlots, data.remaining);
+    renderDashboard(data);
     if (!data.initialized) {
       setupNote.classList.remove("hidden");
       submitBtn.disabled = true;
@@ -86,19 +179,16 @@ async function refreshState() {
   }
 }
 
-function showResult(number, name, note) {
-  resultNumber.textContent = number;
-  resultName.textContent = name;
-  resultNote.textContent = note || "";
-  resultBox.classList.remove("hidden");
-}
-
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   clearError();
 
   const name = nameInput.value.trim();
   const flower = flowerInput.value.trim();
+  const bankName = bankNameInput.value.trim();
+  const accountNumber = accountNumberInput.value.trim();
+  const accountName = accountNameInput.value.trim();
+
   if (!name || !flower) {
     showError("Please fill in both your name and your flower.");
     return;
@@ -111,29 +201,30 @@ form.addEventListener("submit", async (e) => {
     const res = await fetch("/api/submit", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ name, flower }),
+      body: JSON.stringify({ name, flower, bankName, accountNumber, accountName }),
     });
     const data = await res.json();
 
     if (!res.ok) {
       showError(data.error || "Something went wrong. Please try again.");
-      if (data.entries) renderGarden(data.entries, data.totalSlots, data.remaining);
       return;
     }
 
     localStorage.setItem(LOCAL_KEY, JSON.stringify({ name, flower, number: data.number }));
 
-    showResult(
-      data.number,
-      `${name} — ${flower}`,
-      data.alreadySubmitted
-        ? "You'd already planted this entry, so here's your number again."
-        : "Your spot is saved. Numbers are drawn at random, so this is truly yours."
-    );
+    let note;
+    if (data.alreadySubmitted && data.bankUpdated) {
+      note = "Your bank details were saved. Here's your number again.";
+    } else if (data.alreadySubmitted) {
+      note = "You'd already planted this entry, so here's your number again.";
+    } else {
+      note = "Your spot is saved. Numbers are drawn at random, so this is truly yours.";
+    }
+    showResult(data.number, `${name} — ${flower}`, note);
 
-    renderGarden(data.entries, data.totalSlots, data.remaining);
     setupNote.classList.add("hidden");
     form.reset();
+    await refreshState();
   } catch (err) {
     showError("Couldn't reach the garden. Check your connection and try again.");
   } finally {
@@ -142,9 +233,21 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
+historyToggle.addEventListener("click", () => {
+  const isHidden = historySection.classList.toggle("hidden");
+  historyToggle.textContent = isHidden ? "Show history" : "Hide history";
+});
+
+function closeAdminPanels(except) {
+  for (const box of [setupBox, resetBox, markdoneBox]) {
+    if (box !== except) box.classList.add("hidden");
+  }
+}
+
 setupToggle.addEventListener("click", () => {
+  const willShow = setupBox.classList.contains("hidden");
+  closeAdminPanels(willShow ? setupBox : null);
   setupBox.classList.toggle("hidden");
-  resetBox.classList.add("hidden");
 });
 
 setupBtn.addEventListener("click", async () => {
@@ -179,8 +282,9 @@ setupBtn.addEventListener("click", async () => {
 });
 
 resetToggle.addEventListener("click", () => {
+  const willShow = resetBox.classList.contains("hidden");
+  closeAdminPanels(willShow ? resetBox : null);
   resetBox.classList.toggle("hidden");
-  setupBox.classList.add("hidden");
 });
 
 resetBtn.addEventListener("click", async () => {
@@ -208,6 +312,43 @@ resetBtn.addEventListener("click", async () => {
     await refreshState();
   } catch (err) {
     resetMsg.textContent = "Couldn't reach the garden.";
+  }
+});
+
+markdoneToggle.addEventListener("click", () => {
+  const willShow = markdoneBox.classList.contains("hidden");
+  closeAdminPanels(willShow ? markdoneBox : null);
+  markdoneBox.classList.toggle("hidden");
+});
+
+markdoneBtn.addEventListener("click", async () => {
+  const passcode = markdonePasscode.value;
+  const number = parseInt(markdoneNumber.value, 10);
+  if (!passcode) {
+    markdoneMsg.textContent = "Enter the organizer passcode.";
+    return;
+  }
+  if (!Number.isFinite(number)) {
+    markdoneMsg.textContent = "Enter the number to mark as collected.";
+    return;
+  }
+  markdoneMsg.textContent = "Updating...";
+  try {
+    const res = await fetch("/api/markdone", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ passcode, number }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      markdoneMsg.textContent = data.error || "Could not update.";
+      return;
+    }
+    markdoneMsg.textContent = `Number ${number} marked as collected.`;
+    markdoneNumber.value = "";
+    await refreshState();
+  } catch (err) {
+    markdoneMsg.textContent = "Couldn't reach the garden.";
   }
 });
 

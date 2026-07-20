@@ -212,9 +212,85 @@ form input:focus {
   color: var(--ink-soft);
 }
 
+.optional-tag {
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+  font-size: 0.78rem;
+  color: #a39a7c;
+}
+
+.form-help {
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.current-turn {
+  background: var(--green-deep);
+  color: var(--parchment);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.current-label {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+}
+.current-name {
+  font-family: "Fraunces", serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 6px 0 0;
+}
+.current-flower {
+  margin: 2px 0 12px;
+  color: #d9d3bd;
+  font-size: 0.9rem;
+}
+.current-flower::before { content: "❀ "; }
+.current-bank {
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.current-bank p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.current-bank span:first-child {
+  color: #b9b39c;
+}
+.current-no-bank {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #d9a441;
+  font-style: italic;
+}
+
+.sub-heading {
+  font-family: "Fraunces", serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 4px 0 12px;
+  color: var(--ink);
+}
+
 .empty {
   color: var(--ink-soft);
   font-style: italic;
+}
+
+.history-toggle {
+  margin-top: 18px;
+  display: inline-block;
 }
 
 .garden-list {

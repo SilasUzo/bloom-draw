@@ -40,12 +40,18 @@ exports.handler = async (event) => {
 
   const name = (body.name || "").trim();
   const flower = (body.flower || "").trim();
+  const bankName = (body.bankName || "").trim();
+  const accountNumber = (body.accountNumber || "").trim();
+  const accountName = (body.accountName || "").trim();
 
   if (!name || !flower) {
     return resp(400, { error: "Please provide both a name and a flower." });
   }
   if (name.length > 60 || flower.length > 40) {
     return resp(400, { error: "Name or flower is too long." });
+  }
+  if (bankName.length > 60 || accountNumber.length > 40 || accountName.length > 60) {
+    return resp(400, { error: "Bank details are too long." });
   }
 
   const store = getBlobStore();
@@ -61,9 +67,18 @@ exports.handler = async (event) => {
   const key = name.toLowerCase();
   const existing = state.entries.find((e) => e.key === key);
   if (existing) {
+    let bankUpdated = false;
+    if (bankName || accountNumber || accountName) {
+      existing.bankName = bankName || existing.bankName || "";
+      existing.accountNumber = accountNumber || existing.accountNumber || "";
+      existing.accountName = accountName || existing.accountName || "";
+      bankUpdated = true;
+      await store.setJSON(STATE_KEY, state);
+    }
     return resp(200, {
       number: existing.number,
       alreadySubmitted: true,
+      bankUpdated,
       totalSlots: state.totalSlots,
       remaining: state.availableNumbers.length,
       entries: sortedEntries(state),
@@ -79,13 +94,25 @@ exports.handler = async (event) => {
 
   const idx = Math.floor(Math.random() * state.availableNumbers.length);
   const number = state.availableNumbers.splice(idx, 1)[0];
-  state.entries.push({ key, name, flower, number, ts: Date.now() });
+  state.entries.push({
+    key,
+    name,
+    flower,
+    number,
+    bankName,
+    accountNumber,
+    accountName,
+    status: "pending",
+    doneAt: null,
+    ts: Date.now(),
+  });
 
   await store.setJSON(STATE_KEY, state);
 
   return resp(200, {
     number,
     alreadySubmitted: false,
+    bankUpdated: Boolean(bankName || accountNumber || accountName),
     totalSlots: state.totalSlots,
     remaining: state.availableNumbers.length,
     entries: sortedEntries(state),
