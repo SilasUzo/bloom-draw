@@ -238,7 +238,7 @@ form.addEventListener("submit", async (e) => {
     showError("Couldn't reach the garden. Check your connection and try again.");
   } finally {
     submitBtn.disabled = false;
-    submitBtn.textContent = "Draw my number";
+    updateSubmitLabel();
   }
 });
 
@@ -443,6 +443,23 @@ if (mine) {
     showResult(parsed.number, `${parsed.name} — ${parsed.flower}`, "This is the number you already drew on this device.");
   } catch {}
 }
+
+function updateSubmitLabel() {
+  const hasNumberOnThisDevice = Boolean(localStorage.getItem(LOCAL_KEY));
+  const hasBankInput = Boolean(
+    bankNameInput.value.trim() || accountNumberInput.value.trim() || accountNameInput.value.trim()
+  );
+  if (hasNumberOnThisDevice && hasBankInput) {
+    submitBtn.textContent = "Save my details";
+  } else {
+    submitBtn.textContent = "Draw my number";
+  }
+}
+
+for (const el of [bankNameInput, accountNumberInput, accountNameInput]) {
+  el.addEventListener("input", updateSubmitLabel);
+}
+updateSubmitLabel();
 
 refreshState();
 setInterval(refreshState, 6000);
