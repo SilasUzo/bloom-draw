@@ -54,6 +54,14 @@ const markdonePasscode = document.getElementById("markdone-passcode");
 const markdoneBtn = document.getElementById("markdone-btn");
 const markdoneMsg = document.getElementById("markdone-msg");
 
+const swapToggle = document.getElementById("swap-toggle");
+const swapBox = document.getElementById("swap-box");
+const swapNumberA = document.getElementById("swap-number-a");
+const swapNumberB = document.getElementById("swap-number-b");
+const swapPasscode = document.getElementById("swap-passcode");
+const swapBtn = document.getElementById("swap-btn");
+const swapMsg = document.getElementById("swap-msg");
+
 const LOCAL_KEY = "bloom-draw-mine";
 
 function escapeHtml(str) {
@@ -84,7 +92,6 @@ function renderDashboard(data) {
 
   gardenCount.textContent = totalSlots ? `${totalPlanted} of ${totalSlots} planted` : "";
 
-  // Current turn card
   if (currentTurn) {
     currentTurnCard.classList.remove("hidden");
     allDoneNote.classList.add("hidden");
@@ -107,21 +114,11 @@ function renderDashboard(data) {
     }
   } else {
     currentTurnCard.classList.add("hidden");
-    if (totalPlanted > 0) {
-      allDoneNote.classList.remove("hidden");
-    } else {
-      allDoneNote.classList.add("hidden");
-    }
+    allDoneNote.classList.toggle("hidden", totalPlanted === 0);
   }
 
-  // Empty state
-  if (totalPlanted === 0) {
-    gardenEmpty.classList.remove("hidden");
-  } else {
-    gardenEmpty.classList.add("hidden");
-  }
+  gardenEmpty.classList.toggle("hidden", totalPlanted !== 0);
 
-  // Up next list
   gardenList.innerHTML = "";
   if (upNext.length > 0) {
     upNextSection.classList.remove("hidden");
@@ -140,7 +137,6 @@ function renderDashboard(data) {
     upNextSection.classList.add("hidden");
   }
 
-  // History list
   historyList.innerHTML = "";
   if (history.length > 0) {
     historyToggle.classList.remove("hidden");
@@ -239,7 +235,7 @@ historyToggle.addEventListener("click", () => {
 });
 
 function closeAdminPanels(except) {
-  for (const box of [setupBox, resetBox, markdoneBox]) {
+  for (const box of [setupBox, resetBox, markdoneBox, swapBox]) {
     if (box !== except) box.classList.add("hidden");
   }
 }
@@ -349,6 +345,46 @@ markdoneBtn.addEventListener("click", async () => {
     await refreshState();
   } catch (err) {
     markdoneMsg.textContent = "Couldn't reach the garden.";
+  }
+});
+
+swapToggle.addEventListener("click", () => {
+  const willShow = swapBox.classList.contains("hidden");
+  closeAdminPanels(willShow ? swapBox : null);
+  swapBox.classList.toggle("hidden");
+});
+
+swapBtn.addEventListener("click", async () => {
+  const passcode = swapPasscode.value;
+  const numberA = parseInt(swapNumberA.value, 10);
+  const numberB = parseInt(swapNumberB.value, 10);
+  if (!passcode) {
+    swapMsg.textContent = "Enter the organizer passcode.";
+    return;
+  }
+  if (!Number.isFinite(numberA) || !Number.isFinite(numberB)) {
+    swapMsg.textContent = "Enter both numbers to swap.";
+    return;
+  }
+  swapMsg.textContent = "Swapping...";
+  try {
+    const res = await fetch("/api/swap", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ passcode, numberA, numberB }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      swapMsg.textContent = data.error || "Could not swap.";
+      return;
+    }
+    const [a, b] = data.swapped;
+    swapMsg.textContent = `Swapped: ${a.name} is now #${a.number}, ${b.name} is now #${b.number}.`;
+    swapNumberA.value = "";
+    swapNumberB.value = "";
+    await refreshState();
+  } catch (err) {
+    swapMsg.textContent = "Couldn't reach the garden.";
   }
 });
 

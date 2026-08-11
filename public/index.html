@@ -97,6 +97,7 @@
   <button id="setup-toggle" class="link-btn">Organizer setup</button>
   <button id="reset-toggle" class="link-btn">Organizer reset</button>
   <button id="markdone-toggle" class="link-btn">Mark contribution collected</button>
+  <button id="swap-toggle" class="link-btn">Swap numbers</button>
 
   <div id="setup-box" class="reset-box hidden">
     <input type="number" id="setup-slots" placeholder="Number of friends" min="2" max="200" />
@@ -116,6 +117,14 @@
     <input type="password" id="markdone-passcode" placeholder="Passcode" />
     <button id="markdone-btn">Mark as done</button>
     <p id="markdone-msg" class="reset-msg"></p>
+  </div>
+
+  <div id="swap-box" class="reset-box hidden">
+    <input type="number" id="swap-number-a" placeholder="First number" min="1" />
+    <input type="number" id="swap-number-b" placeholder="Second number" min="1" />
+    <input type="password" id="swap-passcode" placeholder="Passcode" />
+    <button id="swap-btn">Swap</button>
+    <p id="swap-msg" class="reset-msg"></p>
   </div>
 </footer>
 

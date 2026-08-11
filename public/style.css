@@ -135,6 +135,21 @@ form input:focus {
   box-shadow: 0 0 0 3px rgba(201,123,132,0.18);
 }
 
+.optional-tag {
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+  font-size: 0.78rem;
+  color: #a39a7c;
+}
+
+.form-help {
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
 .hidden { display: none !important; }
 
 #submit-btn {
@@ -212,19 +227,9 @@ form input:focus {
   color: var(--ink-soft);
 }
 
-.optional-tag {
-  text-transform: none;
-  letter-spacing: normal;
-  font-weight: 400;
-  font-size: 0.78rem;
-  color: #a39a7c;
-}
-
-.form-help {
-  margin: 12px 0 0;
-  font-size: 0.8rem;
+.empty {
   color: var(--ink-soft);
-  line-height: 1.5;
+  font-style: italic;
 }
 
 .current-turn {
@@ -281,11 +286,6 @@ form input:focus {
   font-weight: 600;
   margin: 4px 0 12px;
   color: var(--ink);
-}
-
-.empty {
-  color: var(--ink-soft);
-  font-style: italic;
 }
 
 .history-toggle {
@@ -356,12 +356,15 @@ form input:focus {
   font-size: 0.78rem;
   text-decoration: underline;
   cursor: pointer;
+  margin: 0 8px;
 }
 .reset-box {
   margin-top: 12px;
   display: inline-flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 .reset-box input {
   padding: 8px 10px;
