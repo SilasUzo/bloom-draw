@@ -98,6 +98,7 @@
   <button id="reset-toggle" class="link-btn">Organizer reset</button>
   <button id="markdone-toggle" class="link-btn">Mark contribution collected</button>
   <button id="swap-toggle" class="link-btn">Swap numbers</button>
+  <button id="reverse-toggle" class="link-btn" disabled title="Available once everyone has been marked done">Reverse order</button>
 
   <div id="setup-box" class="reset-box hidden">
     <input type="number" id="setup-slots" placeholder="Number of friends" min="2" max="200" />
@@ -125,6 +126,13 @@
     <input type="password" id="swap-passcode" placeholder="Passcode" />
     <button id="swap-btn">Swap</button>
     <p id="swap-msg" class="reset-msg"></p>
+  </div>
+
+  <div id="reverse-box" class="reset-box hidden">
+    <p class="reverse-note">Everyone has collected. Reverse the order to start round two, or use Organizer reset for a brand new draw instead.</p>
+    <input type="password" id="reverse-passcode" placeholder="Passcode" />
+    <button id="reverse-btn">Reverse the order</button>
+    <p id="reverse-msg" class="reset-msg"></p>
   </div>
 </footer>
 

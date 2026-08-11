@@ -358,6 +358,11 @@ form input:focus {
   cursor: pointer;
   margin: 0 8px;
 }
+.link-btn:disabled {
+  color: #5c6459;
+  text-decoration: none;
+  cursor: not-allowed;
+}
 .reset-box {
   margin-top: 12px;
   display: inline-flex;
@@ -387,4 +392,12 @@ form input:focus {
   font-size: 0.78rem;
   margin: 6px 0 0;
   color: var(--gold);
+}
+
+.reverse-note {
+  width: 100%;
+  font-size: 0.78rem;
+  color: #c9c2a8;
+  margin: 0 0 4px;
+  line-height: 1.5;
 }

@@ -62,6 +62,12 @@ const swapPasscode = document.getElementById("swap-passcode");
 const swapBtn = document.getElementById("swap-btn");
 const swapMsg = document.getElementById("swap-msg");
 
+const reverseToggle = document.getElementById("reverse-toggle");
+const reverseBox = document.getElementById("reverse-box");
+const reversePasscode = document.getElementById("reverse-passcode");
+const reverseBtn = document.getElementById("reverse-btn");
+const reverseMsg = document.getElementById("reverse-msg");
+
 const LOCAL_KEY = "bloom-draw-mine";
 
 function escapeHtml(str) {
@@ -170,6 +176,13 @@ async function refreshState() {
       setupNote.classList.add("hidden");
       submitBtn.disabled = false;
     }
+    reverseToggle.disabled = !data.roundComplete;
+    reverseToggle.title = data.roundComplete
+      ? "Flip everyone's number for a new round"
+      : "Available once everyone has been marked done";
+    if (!data.roundComplete) {
+      reverseBox.classList.add("hidden");
+    }
   } catch (err) {
     // Silent fail on background refresh; the form still works on submit.
   }
@@ -235,7 +248,7 @@ historyToggle.addEventListener("click", () => {
 });
 
 function closeAdminPanels(except) {
-  for (const box of [setupBox, resetBox, markdoneBox, swapBox]) {
+  for (const box of [setupBox, resetBox, markdoneBox, swapBox, reverseBox]) {
     if (box !== except) box.classList.add("hidden");
   }
 }
@@ -385,6 +398,40 @@ swapBtn.addEventListener("click", async () => {
     await refreshState();
   } catch (err) {
     swapMsg.textContent = "Couldn't reach the garden.";
+  }
+});
+
+reverseToggle.addEventListener("click", () => {
+  const willShow = reverseBox.classList.contains("hidden");
+  closeAdminPanels(willShow ? reverseBox : null);
+  reverseBox.classList.toggle("hidden");
+});
+
+reverseBtn.addEventListener("click", async () => {
+  const passcode = reversePasscode.value;
+  if (!passcode) {
+    reverseMsg.textContent = "Enter the organizer passcode.";
+    return;
+  }
+  reverseMsg.textContent = "Reversing...";
+  try {
+    const res = await fetch("/api/reverse", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ passcode }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      reverseMsg.textContent = data.error || "Could not reverse the order.";
+      return;
+    }
+    reverseMsg.textContent = "Order reversed. Round two has begun.";
+    reversePasscode.value = "";
+    localStorage.removeItem(LOCAL_KEY);
+    resultBox.classList.add("hidden");
+    await refreshState();
+  } catch (err) {
+    reverseMsg.textContent = "Couldn't reach the garden.";
   }
 });
 
