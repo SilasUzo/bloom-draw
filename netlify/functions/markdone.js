@@ -57,6 +57,19 @@ exports.handler = async (event) => {
     return resp(404, { error: `No entry found with number ${number}.` });
   }
 
+  if (!undo) {
+    const pending = state.entries
+      .filter((e) => (e.status || "pending") !== "done")
+      .sort((a, b) => a.number - b.number);
+    const current = pending[0];
+
+    if (current && current.number !== number) {
+      return resp(409, {
+        error: `#${number} isn't the current turn. #${current.number} (${current.name}) needs to be marked done first — or use Swap numbers if the order needs to change.`,
+      });
+    }
+  }
+
   entry.status = undo ? "pending" : "done";
   entry.doneAt = undo ? null : Date.now();
 
