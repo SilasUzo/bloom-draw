@@ -387,6 +387,11 @@ form input:focus {
   font-weight: 600;
   cursor: pointer;
 }
+.undo-btn {
+  background: transparent !important;
+  border: 1.5px solid #8f9c8b !important;
+  color: var(--parchment) !important;
+}
 .reset-msg {
   width: 100%;
   font-size: 0.78rem;
