@@ -203,6 +203,10 @@ form.addEventListener("submit", async (e) => {
     showError("Please fill in both your name and your flower.");
     return;
   }
+  if (!bankName || !accountNumber) {
+    showError("Bank name and account number are required so we know where to send your contribution.");
+    return;
+  }
 
   submitBtn.disabled = true;
   submitBtn.textContent = "Drawing...";
