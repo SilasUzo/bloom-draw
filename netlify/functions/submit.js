@@ -92,6 +92,12 @@ exports.handler = async (event) => {
     });
   }
 
+  if (!bankName || !accountNumber) {
+    return resp(400, {
+      error: "Bank name and account number are required so the group knows where to send your contribution.",
+    });
+  }
+
   const idx = Math.floor(Math.random() * state.availableNumbers.length);
   const number = state.availableNumbers.splice(idx, 1)[0];
   state.entries.push({
