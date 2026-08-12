@@ -52,6 +52,7 @@ const markdoneBox = document.getElementById("markdone-box");
 const markdoneNumber = document.getElementById("markdone-number");
 const markdonePasscode = document.getElementById("markdone-passcode");
 const markdoneBtn = document.getElementById("markdone-btn");
+const markdoneUndoBtn = document.getElementById("markdone-undo-btn");
 const markdoneMsg = document.getElementById("markdone-msg");
 
 const swapToggle = document.getElementById("swap-toggle");
@@ -330,7 +331,7 @@ markdoneToggle.addEventListener("click", () => {
   markdoneBox.classList.toggle("hidden");
 });
 
-markdoneBtn.addEventListener("click", async () => {
+async function submitMarkDone(undo) {
   const passcode = markdonePasscode.value;
   const number = parseInt(markdoneNumber.value, 10);
   if (!passcode) {
@@ -338,7 +339,9 @@ markdoneBtn.addEventListener("click", async () => {
     return;
   }
   if (!Number.isFinite(number)) {
-    markdoneMsg.textContent = "Enter the number to mark as collected.";
+    markdoneMsg.textContent = undo
+      ? "Enter the number to send back to pending."
+      : "Enter the number to mark as collected.";
     return;
   }
   markdoneMsg.textContent = "Updating...";
@@ -346,20 +349,25 @@ markdoneBtn.addEventListener("click", async () => {
     const res = await fetch("/api/markdone", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ passcode, number }),
+      body: JSON.stringify({ passcode, number, undo }),
     });
     const data = await res.json();
     if (!res.ok) {
       markdoneMsg.textContent = data.error || "Could not update.";
       return;
     }
-    markdoneMsg.textContent = `Number ${number} marked as collected.`;
+    markdoneMsg.textContent = undo
+      ? `Number ${number} moved back to pending.`
+      : `Number ${number} marked as collected.`;
     markdoneNumber.value = "";
     await refreshState();
   } catch (err) {
     markdoneMsg.textContent = "Couldn't reach the garden.";
   }
-});
+}
+
+markdoneBtn.addEventListener("click", () => submitMarkDone(false));
+markdoneUndoBtn.addEventListener("click", () => submitMarkDone(true));
 
 swapToggle.addEventListener("click", () => {
   const willShow = swapBox.classList.contains("hidden");
